@@ -5,7 +5,7 @@ use clap::Parser;
 #[command(author, version, about, long_about = None)]
 struct Args {
     /// The year to generate a solution for
-    #[arg(short, long)]
+    #[arg(short, long, default_value = "2023")]
     year: u16,
 
     /// The day to generate a solution for
@@ -16,4 +16,5 @@ struct Args {
 fn main() {
     let args = Args::parse();
     println!("Year {}, Day {}", args.year, args.day);
+    todo!("Implement solution generation");
 }
