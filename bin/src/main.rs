@@ -1,11 +1,10 @@
 use std::io::Write;
 
-use lib::solutions::sol_2022_01;
+// Change the year and day to the day you want to run
+use lib::solutions::sol_2022_01::solver;
 
 fn main() -> anyhow::Result<()> {
-    let solver = sol_2022_01::solver()?;
-    let solution = solver.solve();
-
+    let solution = solver()?.solve();
     let mut stdout = std::io::stdout();
     stdout.write_all(solution.as_bytes())?;
 
