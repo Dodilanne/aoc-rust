@@ -1,1 +1,1 @@
-pub mod sol_2022_01;
+pub mod sol_2023_01;
