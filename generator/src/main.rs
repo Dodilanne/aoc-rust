@@ -17,19 +17,37 @@ struct Args {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    generate_solution_file(&args)?;
-    append_to_mod_file(&args)?;
-    update_runner(&args)?;
+    let start = std::time::Instant::now();
+
+    let mut handles = vec![];
+
+    handles.push(std::thread::spawn(move || -> anyhow::Result<()> {
+        generate_solution_file(args.year, args.day)
+    }));
+    handles.push(std::thread::spawn(move || -> anyhow::Result<()> {
+        append_to_mod_file(args.year, args.day)
+    }));
+    handles.push(std::thread::spawn(move || -> anyhow::Result<()> {
+        update_runner(args.year, args.day)
+    }));
+
+    for handle in handles {
+        handle.join().unwrap()?;
+    }
+
+    let end = std::time::Instant::now();
+
+    println!("Generated solution in {:?}", end - start);
 
     Ok(())
 }
 
-fn append_to_mod_file(args: &Args) -> anyhow::Result<()> {
+fn append_to_mod_file(year: u16, day: u8) -> anyhow::Result<()> {
     let mod_path = format!("lib/src/solutions/mod.rs");
     let contents = format!(
         r#"pub mod sol_{}_{:0>2};
 "#,
-        args.year, args.day
+        year, day
     );
     let mut file = std::fs::OpenOptions::new()
         .write(true)
@@ -40,8 +58,8 @@ fn append_to_mod_file(args: &Args) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn generate_solution_file(args: &Args) -> anyhow::Result<()> {
-    let solution_path = format!("lib/src/solutions/sol_{}_{:0>2}.rs", args.year, args.day);
+fn generate_solution_file(year: u16, day: u8) -> anyhow::Result<()> {
+    let solution_path = format!("lib/src/solutions/sol_{}_{:0>2}.rs", year, day);
     let contents = format!(
         r#"use crate::utils::solver::Solver;
 
@@ -54,14 +72,14 @@ pub fn solver() -> anyhow::Result<Solver> {{
     Solver::new({}, {}, solve)
 }}
 "#,
-        args.year, args.day
+        year, day
     );
     std::fs::write(solution_path, contents)?;
 
     Ok(())
 }
 
-fn update_runner(args: &Args) -> anyhow::Result<()> {
+fn update_runner(year: u16, day: u8) -> anyhow::Result<()> {
     let path = "runner/src/main.rs";
     let contents = format!(
         r#"use std::io::Write;
@@ -77,7 +95,7 @@ fn main() -> anyhow::Result<()> {{
     Ok(())
 }}
 "#,
-        args.year, args.day
+        year, day
     );
     std::fs::write(path, contents)?;
 
