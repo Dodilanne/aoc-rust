@@ -2,8 +2,9 @@
 use lib::solutions::sol_2023_01::solver;
 
 fn main() -> anyhow::Result<()> {
+    let solver = solver()?;
     let start_time = std::time::Instant::now();
-    let solution = solver()?.solve();
+    let solution = solver.solve();
     let end_time = std::time::Instant::now();
 
     println!("Output: {}", solution);

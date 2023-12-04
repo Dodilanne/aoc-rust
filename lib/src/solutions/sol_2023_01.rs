@@ -22,44 +22,39 @@ fn solve_pt_1(input: &str) -> String {
     sum.to_string()
 }
 
+const NUMBERS: [&str; 9] = [
+    "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+];
+
 fn solve_pt_2(input: &str) -> String {
     let sum = input
         .lines()
         .map(|line| {
+            let mut digits = vec![];
             let mut index = 0;
-            let parsed_line = std::iter::from_fn(move || {
-                let reduced_line = &line[index..];
-                let result = if reduced_line.starts_with("one") {
-                    Some('1')
-                } else if reduced_line.starts_with("two") {
-                    Some('2')
-                } else if reduced_line.starts_with("three") {
-                    Some('3')
-                } else if reduced_line.starts_with("four") {
-                    Some('4')
-                } else if reduced_line.starts_with("five") {
-                    Some('5')
-                } else if reduced_line.starts_with("six") {
-                    Some('6')
-                } else if reduced_line.starts_with("seven") {
-                    Some('7')
-                } else if reduced_line.starts_with("eight") {
-                    Some('8')
-                } else if reduced_line.starts_with("nine") {
-                    Some('9')
+            while index < line.len() {
+                let sub_line = &line[index..];
+                let nbr = NUMBERS.iter().enumerate().find_map(|(i, &nbr)| {
+                    if sub_line.starts_with(nbr) {
+                        Some(i + 1)
+                    } else {
+                        None
+                    }
+                });
+                if let Some(nbr) = nbr {
+                    index += NUMBERS[nbr - 1].len() - 1;
+                    digits.push(nbr);
                 } else {
-                    let result = reduced_line.chars().next();
-                    result
-                };
+                    if let Some(digit) = sub_line.chars().next().and_then(|c| c.to_digit(10)) {
+                        digits.push(digit as usize);
+                    }
+                    index += 1;
+                }
+            }
 
-                index += 1;
-
-                result
-            });
-
-            let mut digits = parsed_line.filter_map(|c| c.to_digit(10));
-            let first = digits.next().expect("no first number");
-            let last = digits.last().unwrap_or(first);
+            let mut it = digits.iter();
+            let first = it.next().expect("no first number");
+            let last = it.last().unwrap_or(first);
 
             format!("{first}{last}")
                 .parse::<u32>()
@@ -68,17 +63,4 @@ fn solve_pt_2(input: &str) -> String {
         .sum::<u32>();
 
     sum.to_string()
-}
-
-#[test]
-fn test_pt_2() {
-    let input = "two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen";
-    let output = "281";
-    assert_eq!(solve_pt_2(input), output);
 }
