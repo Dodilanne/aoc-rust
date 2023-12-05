@@ -82,15 +82,20 @@ pub fn solver() -> anyhow::Result<Solver> {{
 fn update_runner(year: u16, day: u8) -> anyhow::Result<()> {
     let path = "runner/src/main.rs";
     let contents = format!(
-        r#"use std::io::Write;
-
-// Change the year and day to the day you want to run
+        r#"// Change the year and day to the day you want to run
 use lib::solutions::sol_{}_{:0>2}::solver;
 
 fn main() -> anyhow::Result<()> {{
-    let solution = solver()?.solve();
-    let mut stdout = std::io::stdout();
-    stdout.write_all(solution.as_bytes())?;
+    let solver = solver()?;
+
+    let start_time = std::time::Instant::now();
+    let solution = solver.solve();
+    let end_time = std::time::Instant::now();
+
+    let elapsed = end_time - start_time;
+
+    println!("\nSolution : {{solution}}");
+    println!("Elapsed  : {{}}ms\n", elapsed.as_millis());
 
     Ok(())
 }}
