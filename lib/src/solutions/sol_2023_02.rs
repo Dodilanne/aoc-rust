@@ -12,25 +12,21 @@ fn solve_pt_1(input: &str) -> String {
             let split: Vec<&str> = truncated_line.split(':').collect();
             let game_id = split[0].parse::<u32>().expect("game id should be a number");
 
-            let (red, green, blue) = split[1]
-                .split(";")
-                .map(|draw| {
-                    draw.trim().split(",").fold((0, 0, 0), |mut acc, data| {
-                        let split = data.trim().split(" ").collect::<Vec<_>>();
-                        let qty = split[0]
-                            .parse::<u32>()
-                            .expect("quantity should be a number");
-                        match split[1] {
-                            "red" => acc.0 += qty,
-                            "green" => acc.1 += qty,
-                            "blue" => acc.2 += qty,
-                            _ => {}
-                        };
-                        acc
-                    })
-                })
-                .reduce(|a, b| (a.0 + b.0, a.1 + b.1, a.2 + b.2))
-                .expect("should be reduceable");
+            let (red, green, blue) = split[1].split(";").fold((0, 0, 0), |mut acc, draw| {
+                draw.trim().split(",").for_each(|data| {
+                    let split = data.trim().split(" ").collect::<Vec<_>>();
+                    let qty = split[0]
+                        .parse::<u32>()
+                        .expect("quantity should be a number");
+                    match split[1] {
+                        "red" => acc.0 = std::cmp::max(acc.0, qty),
+                        "green" => acc.1 = std::cmp::max(acc.1, qty),
+                        "blue" => acc.2 = std::cmp::max(acc.2, qty),
+                        _ => {}
+                    };
+                });
+                acc
+            });
 
             if red <= 12 && green <= 13 && blue <= 14 {
                 Some(game_id)
