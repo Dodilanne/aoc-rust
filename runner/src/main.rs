@@ -1,5 +1,5 @@
 // Change the year and day to the day you want to run
-use lib::solutions::sol_2023_02::solver;
+use lib::solutions::sol_2023_03::solver;
 
 fn main() -> anyhow::Result<()> {
     let solver = solver()?;
